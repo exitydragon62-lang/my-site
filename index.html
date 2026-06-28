@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomo Productions</title>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1876593363815884"
+     crossorigin="anonymous"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .phase-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .phase-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .phase-dot.active {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .phase-dot.completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .ad-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 280px;
+            border: 2px solid #e9ecef;
+            position: relative;
+        }
+
+        .ad-badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+
+        .ad-click-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            cursor: pointer;
+            z-index: 5;
+        }
+
+        .timer-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .timer {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.1s linear;
+            width: 0%;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+        }
+
+        .phase-content {
+            display: none;
+            text-align: center;
+        }
+
+        .phase-content.active {
+            display: block;
+        }
+
+        .phase-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .phase-description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .counter {
+            font-size: 14px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .ad-instructions {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            color: #856404;
+            font-size: 14px;
+        }
+
+        .ad-instructions strong {
+            color: #d39e00;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .phase-dot {
+                width: 35px;
+                height: 35px;
+                font-size: 14px;
+            }
+
+            .phase-title {
+                font-size: 22px;
+            }
+        }
+
+        /* Estilos para os anúncios */
+        .adsbygoogle {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Indicador de Fases -->
+        <div class="phase-indicator">
+            <div class="phase-dot active" id="dot1">1</div>
+            <div class="phase-dot" id="dot2">2</div>
+            <div class="phase-dot" id="dot3">3</div>
+        </div>
+
+        <!-- Fase 1 -->
+        <div class="phase-content active" id="phase1">
+            <div class="phase-title">🎯 Fase 1</div>
+            <div class="phase-description">Clique no anúncio abaixo e aguarde 3 segundos para avançar</div>
+            
+            <div class="ad-container" id="ad1">
+                <div class="ad-badge">PUBLICIDADE</div>
+                <div class="ad-click-overlay" onclick="handleAdClick(1)"></div>
+                
+                <!-- Google AdSense - Fase 1 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-1876593363815884"
+                     data-ad-slot="1234567890"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <div class="ad-instructions">
+                💡 <strong>Instrução:</strong> Clique no anúncio acima e aguarde 3 segundos para desbloquear o botão.
+            </div>
+
+            <div class="timer-container">
+                <div class="timer" id="timer1">⏱️ 0s / 3s</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress1"></div>
+                </div>
+            </div>
+
+            <button class="btn" id="btn1" disabled>⏳ Aguardando clique no anúncio...</button>
+        </div>
+
+        <!-- Fase 2 -->
+        <div class="phase-content" id="phase2">
+            <div class="phase-title">🚀 Fase 2</div>
+            <div class="phase-description">Clique no anúncio abaixo e aguarde 3 segundos para avançar</div>
+            
+            <div class="ad-container" id="ad2">
+                <div class="ad-badge">PUBLICIDADE</div>
+                <div class="ad-click-overlay" onclick="handleAdClick(2)"></div>
+                
+                <!-- Google AdSense - Fase 2 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-1876593363815884"
+                     data-ad-slot="0987654321"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <div class="ad-instructions">
+                💡 <strong>Instrução:</strong> Clique no anúncio acima e aguarde 3 segundos para desbloquear o botão.
+            </div>
+
+            <div class="timer-container">
+                <div class="timer" id="timer2">⏱️ 0s / 3s</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress2"></div>
+                </div>
+            </div>
+
+            <button class="btn" id="btn2" disabled>⏳ Aguardando clique no anúncio...</button>
+        </div>
+
+        <!-- Fase 3 -->
+        <div class="phase-content" id="phase3">
+            <div class="phase-title">🏆 Fase 3</div>
+            <div class="phase-description">Última etapa! Clique no anúncio e aguarde 3 segundos</div>
+            
+            <div class="ad-container" id="ad3">
+                <div class="ad-badge">PUBLICIDADE</div>
+                <div class="ad-click-overlay" onclick="handleAdClick(3)"></div>
+                
+                <!-- Google AdSense - Fase 3 -->
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-slot="5555555555"
+                     data-ad-client="ca-pub-1876593363815884"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <div class="ad-instructions">
+                💡 <strong>Instrução:</strong> Clique no anúncio acima e aguarde 3 segundos para completar!
+            </div>
+
+            <div class="timer-container">
+                <div class="timer" id="timer3">⏱️ 0s / 3s</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress3"></div>
+                </div>
+            </div>
+
+            <button class="btn" id="btn3" disabled>⏳ Aguardando clique no anúncio...</button>
+        </div>
+
+        <!-- Botão de redirecionamento (aparece após fase 3) -->
+        <button class="btn success" id="redirectBtn" style="display: none;" onclick="redirectToGitHub()">
+            🎉 Ir para o GitHub!
+        </button>
+    </div>
+
+    <script>
+        // Estados das fases
+        const phases = {
+            1: { timer: 0, isActive: false, isCompleted: false, interval: null, adClicked: false },
+            2: { timer: 0, isActive: false, isCompleted: false, interval: null, adClicked: false },
+            3: { timer: 0, isActive: false, isCompleted: false, interval: null, adClicked: false }
+        };
+
+        let currentPhase = 1;
+        const REQUIRED_TIME = 3; // segundos
+        let userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        // Função para lidar com clique no anúncio
+        function handleAdClick(phase) {
+            if (phases[phase].isCompleted) {
+                console.log(`Fase ${phase} já completada`);
+                return;
+            }
+
+            console.log(`📢 Clique no anúncio da fase ${phase}`);
+            phases[phase].adClicked = true;
+            
+            // Registra o clique no backend
+            fetch('http://localhost:3000/api/ad-click', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    phase: phase,
+                    timestamp: Date.now()
+                })
+            }).catch(err => console.log('Erro ao registrar clique:', err));
+            
+            // Inicia o timer se não estiver ativo
+            if (!phases[phase].isActive) {
+                startTimer(phase);
+            }
+        }
+
+        // Função para iniciar o timer
+        function startTimer(phase) {
+            phases[phase].isActive = true;
+            phases[phase].timer = 0;
+            
+            // Atualiza o botão
+            const btn = document.getElementById(`btn${phase}`);
+            btn.disabled = true;
+            btn.textContent = '⏳ Aguardando 3 segundos...';
+            
+            // Atualiza o timer visual
+            const timerElement = document.getElementById(`timer${phase}`);
+            const progressElement = document.getElementById(`progress${phase}`);
+            
+            // Inicia o intervalo
+            phases[phase].interval = setInterval(() => {
+                phases[phase].timer += 0.1;
+                const currentTime = Math.min(phases[phase].timer, REQUIRED_TIME);
+                const progress = (currentTime / REQUIRED_TIME) * 100;
+                
+                // Atualiza timer
+                timerElement.textContent = `⏱️ ${currentTime.toFixed(1)}s / ${REQUIRED_TIME}s`;
+                
+                // Atualiza barra de progresso
+                progressElement.style.width = `${Math.min(progress, 100)}%`;
+                
+                // Verifica se completou o tempo
+                if (phases[phase].timer >= REQUIRED_TIME) {
+                    clearInterval(phases[phase].interval);
+                    phases[phase].isCompleted = true;
+                    phases[phase].isActive = false;
+                    
+                    // Atualiza botão
+                    btn.disabled = false;
+                    btn.textContent = '✅ Avançar para próxima fase';
+                    btn.classList.add('success');
+                    
+                    // Atualiza dot
+                    document.getElementById(`dot${phase}`).classList.remove('active');
+                    document.getElementById(`dot${phase}`).classList.add('completed');
+                    
+                    // Salva progresso no backend
+                    saveProgress(phase);
+                    
+                    // Se for a fase 3, mostra botão de redirecionamento
+                    if (phase === 3) {
+                        document.getElementById('redirectBtn').style.display = 'block';
+                    }
+                    
+                    // Toca um som de conclusão (opcional)
+                    console.log(`✅ Fase ${phase} completada!`);
+                }
+            }, 100);
+        }
+
+        // Função para salvar progresso
+        function saveProgress(phase) {
+            fetch('http://localhost:3000/api/progress', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userId: userId,
+                    phase: phase,
+                    completed: true
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Progresso salvo:', data);
+            })
+            .catch(err => {
+                console.log('Erro ao salvar progresso:', err);
+                // Salva localmente como fallback
+                localStorage.setItem(`phase_${phase}_completed`, 'true');
+            });
+        }
+
+        // Função para avançar fase
+        function setupPhaseButtons() {
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`btn${i}`);
+                btn.addEventListener('click', function() {
+                    if (phases[i].isCompleted) {
+                        if (i < 3) {
+                            // Avança para próxima fase
+                            document.getElementById(`phase${i}`).classList.remove('active');
+                            document.getElementById(`phase${i + 1}`).classList.add('active');
+                            document.getElementById(`dot${i + 1}`).classList.add('active');
+                            currentPhase = i + 1;
+                            
+                            // Scroll para o topo
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                    }
+                });
+            }
+        }
+
+        // Função de redirecionamento
+        function redirectToGitHub() {
+            // Aqui você pode mudar para o site que desejar
+            window.location.href = 'https://github.com';
+        }
+
+        // Carregar progresso salvo
+        function loadSavedProgress() {
+            // Tenta carregar do localStorage
+            for (let i = 1; i <= 3; i++) {
+                if (localStorage.getItem(`phase_${i}_completed`) === 'true') {
+                    phases[i].isCompleted = true;
+                    document.getElementById(`dot${i}`).classList.add('completed');
+                    
+                    // Se todas as fases estiverem completas
+                    if (i === 3) {
+                        document.getElementById('redirectBtn').style.display = 'block';
+                    }
+                }
+            }
+        }
+
+        // Inicialização
+        function init() {
+            setupPhaseButtons();
+            loadSavedProgress();
+            
+            console.log('🚀 Sistema de fases iniciado!');
+            console.log(`👤 User ID: ${userId}`);
+            console.log('📢 Google AdSense configurado!');
+            console.log('💡 Clique nos anúncios para avançar');
+        }
+
+        // Iniciar quando a página carregar
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Recarregar anúncios quando mudar de fase
+        document.querySelectorAll('.phase-content').forEach((content, index) => {
+            const observer = new MutationObserver(() => {
+                if (content.classList.contains('active')) {
+                    // Recarrega os anúncios quando a fase fica ativa
+                    try {
+                        (adsbygoogle = window.adsbygoogle || []).push({});
+                    } catch (e) {
+                        console.log('Erro ao recarregar anúncio:', e);
+                    }
+                }
+            });
+            
+            observer.observe(content, {
+                attributes: true,
+                attributeFilter: ['class']
+            });
+        });
+
+        console.log('✅ Sistema pronto para uso!');
+        console.log('📝 Substitua os data-ad-slot pelos seus slots do AdSense');
+    </script>
+</body>
+</html>
